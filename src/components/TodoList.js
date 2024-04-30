@@ -83,7 +83,7 @@ const TodoList = () => {
 
 
   // toggleTodo 함수는 체크박스를 눌러 할 일의 완료 상태를 변경하는 함수입니다.
-  const toggleTodo = (id) => {
+  const toggleTodo = async (id) => {
     // 할 일 목록에서 해당 id를 가진 할 일의 완료 상태를 반전시킵니다.
     setTodos(
       // todos.map((todo) =>
@@ -108,7 +108,7 @@ const TodoList = () => {
 
 
   // deleteTodo 함수는 할 일을 목록에서 삭제하는 함수입니다.
-  const deleteTodo = (id) => {
+  const deleteTodo = async (id) => {
     // Firestore 에서 해당 id를 가진 할 일을 삭제합니다.
     const todoDoc = doc(todoCollection, id);
     deleteDoc(todoDoc);
