@@ -6,6 +6,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+
 import TodoItem from "@/components/TodoItem";
 import styles from "@/styles/TodoList.module.css";
 
@@ -32,15 +36,28 @@ const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState("");
 
+  const router = useRouter();
+  const { data } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.replace("/login");
+    },
+  });
+
   useEffect(() => {
+    console.log("data", data);
     getTodos();
-  }, []);
+  }, [data]);
 
   const getTodos = async () => {
     // Firestore 쿼리를 만듭니다.
-    const q = query(todoCollection);
+    // const q = query(todoCollection);
     // const q = query(collection(db, "todos"), where("user", "==", user.uid));
     // const q = query(todoCollection, orderBy("datetime", "asc"));
+
+    if (!data?.user?.name) return;
+
+    const q = query(todoCollection, where("userName", "==", data?.user?.name));
 
     // Firestore 에서 할 일 목록을 조회합니다.
     const results = await getDocs(q);
@@ -70,6 +87,7 @@ const TodoList = () => {
 
     // Firestore 에 추가한 할 일을 저장합니다.
     const docRef = await addDoc(todoCollection, {
+      userName: data?.user?.name,
       text: input,
       completed: false,
     });
@@ -120,7 +138,7 @@ const TodoList = () => {
   return (
     <div className={styles.container}>
       <h1 className="text-xl mb-4 font-bold underline underline-offset-4 decoration-wavy">
-        Todo List
+        {data?.user?.name}'s Todo List
       </h1>
       {/* 할 일을 입력받는 텍스트 필드입니다. */}
       <input
